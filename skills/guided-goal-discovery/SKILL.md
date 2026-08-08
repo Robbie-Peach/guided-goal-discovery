@@ -13,6 +13,7 @@ Help the user discover and confirm a goal instead of requiring a finished brief.
 - Ask exactly one decision-relevant question per turn.
 - Choose the question whose answer would most change the direction; do not follow a fixed questionnaire.
 - Make questions easy to answer through concrete contrasts, examples, outcomes, or felt differences.
+- Prefer a native structured-choice control for bounded alternatives when the runtime provides one; otherwise present the same choices as concise numbered text.
 - Match the user’s language and level of abstraction; avoid unexplained professional jargon.
 - Never ask again for information already supplied.
 - Let the user revise or revoke any earlier confirmation at any time.
@@ -71,6 +72,20 @@ Identify non-negotiables, excluded directions, success evidence, and priority wh
 
 When the user says “I don’t know,” do not repeat or broaden the question. Offer two or three genuinely different hypotheses and ask which feels closer—or which feels wrong.
 
+## Present choices adaptively
+
+Use a native structured-choice tool such as `request_user_input` when it is available and all of the following are true:
+
+- one decision-relevant question is ready;
+- two or three short, meaningfully different answers that are mutually exclusive at the level being decided would help the user react;
+- choosing an option would narrow the goal rather than prematurely choose an implementation detail.
+
+Keep the question short and easy to scan. Put the recommended option first when a recommendation is justified, label it as recommended, and give every option a one-sentence description of its effect or tradeoff. Preserve the control’s free-form “Other” route so the user can reject the framing or supply a different idea.
+
+If no structured-choice tool is available, ask the same single question in ordinary text. List the same two or three options with short labels and descriptions, then explicitly allow the user to answer with a number, a label, a mixture, or another idea. Do not report the missing control, ask the user to switch modes, or weaken the quality of the hypotheses.
+
+Treat every click or text selection as a working signal, not final confirmation. Let the user combine options, qualify the choice, reverse it, or replace the offered frame. Do not use a choice control for open exploration, nuanced personal expression, factual questions, or any decision that cannot be represented honestly by two or three alternatives.
+
 Prefer questions such as:
 
 - “Should this reassure the recipient, unsettle them, or make them act?”
@@ -89,6 +104,8 @@ At the end of each stage, pause and summarize only the categories that contain i
 - **Needs confirmation:** still capable of changing the next stage.
 
 Ask the user to confirm or correct the checkpoint before continuing. Do not repeat a full checkpoint after every individual answer unless the direction changes materially.
+
+When a checkpoint is genuinely binary, use the same adaptive interaction: offer confirmation and correction through a structured choice when available, or concise text otherwise. Keep the free-form correction path open.
 
 ## Determine readiness
 
@@ -144,6 +161,8 @@ After final confirmation:
 - Do not pursue completeness through low-value questions.
 - Do not present assumptions as confirmed facts.
 - Do not lock onto the first idea before exposing meaningful alternatives.
+- Do not force a choice merely because a structured-choice control is available.
+- Do not treat a selected option as more authoritative than the user’s explanation or later correction.
 - Do not substitute decorative detail for a missing goal.
 - Do not praise every answer; synthesize it into better decisions.
 - Do not continue questioning after the project is ready to begin.
