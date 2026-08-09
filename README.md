@@ -1,82 +1,129 @@
-# Guided Goal Discovery
+# Guided Goal Discovery｜目标引导模式
 
-A reusable Codex skill for turning vague intentions into a shared goal and a concrete 0-to-1 launch plan through one decision-relevant question at a time.
+[English](README.en.md)
 
-一个通过“一次一个关键问题”，把模糊意图整理为目标共识与0→1启动方案的 Codex Skill。
+一个通过“一次一个关键问题”，把模糊意图、零散想法和相互冲突的偏好，逐步整理为目标共识与 0→1 启动方案的 Codex Skill。
 
-## What it does
+它不会要求用户先写好完整 brief，也不会过早给出一套看似完整的解决方案。Skill 会先帮助用户明确项目为何存在、面向谁、应产生什么变化，再确定本阶段的交付物、边界、判断标准和真正可开始执行的第一步。
 
-- Treats uncertainty and “I don’t know” as valid starting material.
-- Distinguishes the true goal from the deliverable and implementation method.
-- Uses eight internal dimensions grouped into three user-visible stages: Meaning, Form, and Judgment.
-- Offers concrete working hypotheses instead of returning the creative burden to the user.
-- Uses native clickable choices for bounded alternatives when the host provides them, with a lossless text fallback everywhere else.
-- Pauses for confirmation after each stage.
-- Ends with a confirmed Goal Consensus and 0-to-1 Launch Plan, then hands off to execution.
+当方向可以由少量候选假设表达时，它会优先使用宿主提供的可点击选项；控件不可用时，则无损降级为同样清晰的编号文本。用户始终可以选择“其他”、混合多个方向、补充解释或推翻之前的选择。
 
-## Repository structure
+**输入**：模糊意图、稀疏创意种子、相互冲突的偏好、不知道从哪里开始的项目，或会因不同理解产生完全不同结果的需求。
 
-```text
-skills/
-└── guided-goal-discovery/
-    ├── SKILL.md
-    └── agents/
-        └── openai.yaml
-```
+**输出**：经过确认的目标共识、项目形态、判断标准、0→1 启动方案，以及面向执行流程的无损交接。
 
-The repository-level documentation and license stay outside the skill package so the installable skill remains minimal.
+## 功能
 
-## Install
+- 将“不知道”“没有想法”和难以表述视为有效起点，而不是要求用户先完成专业需求文档。
+- 每轮只提出一个最能改变方向的问题，避免多问题问卷和低价值追问。
+- 主动提出两到三个真正不同的工作假设，帮助用户通过吸引、抗拒和修正发现目标。
+- 明确区分目标、交付物和实现手段，避免把用户最先想到的形式误当成真正目的。
+- 通过“意义、形态、判断”三个阶段推进，并在阶段边界暂停确认。
+- 使用目的、对象与情境、体验、交付物、范围、边界、成功证据和取舍八个内部维度。
+- 可用时提供原生可点击选项；不可用时呈现等价的编号文字选项。
+- 保留自由输入和撤回权，任何点击或文字选择都只视为暂定信号。
+- 最终生成“目标共识＋0→1 启动方案”，并将全部边界和优先级交接给执行流程。
+- 不打断清晰请求、事实问题、诊断、修订或方向已经对齐的连续工作。
 
-Copy `skills/guided-goal-discovery` into your Codex skills directory.
+## 方法原则
+
+| 原则 | 实现方式 |
+|---|---|
+| 一次一问 | 每轮只提出一个会实质改变方向的问题，不采用固定问卷 |
+| 意义优先 | 先明确项目为何存在、面向谁以及应产生什么体验，再讨论媒介、格式和工具 |
+| 主动假设 | 用户无法回答时，提出两到三个含义真正不同的工作假设，而不是把创作负担退回给用户 |
+| 自适应选择 | 宿主支持结构化选择控件时提供可点击选项，否则呈现内容等价的编号文本 |
+| 自由修正 | 始终允许选择“其他”、混合方向、补充条件、撤回选择或替换整套问题框架 |
+| 三层分离 | 持续区分目标、当前交付物和实现手段，不把形式直接等同于目的 |
+| 三阶段推进 | 按“意义 → 形态 → 判断”推进，并在每个阶段结束时暂停确认 |
+| 八维判断 | 内部检查目的、对象与情境、体验、交付物、范围、边界、成功证据和取舍 |
+| 状态透明 | 将信息区分为已确认、暂定理解、已排除和待确认，不把推断伪装成事实 |
+| 可识别成功 | 在启动前明确不可妥协项、排除方向、优先级冲突和可观察的成功证据 |
+| 无损交接 | 输出完整的目标共识与 0→1 启动方案，让执行流程无需要求用户重新描述需求 |
+
+## 自适应选择交互
+
+从 v0.2.0 开始，当一个关键问题能够被两到三个互斥方向诚实表达时，Skill 会优先调用宿主提供的原生结构化选择控件：
+
+- 推荐项在有充分理由时排在第一位，并明确标记为推荐；
+- 每个选项用一句话说明选择后的影响或取舍；
+- 保留自由输入的“其他”入口；
+- 点击结果只作为暂定理解，不覆盖用户随后给出的解释或修正。
+
+如果当前环境没有兼容控件，Skill 会展示同样的选项标签和说明，并允许用户回复序号、标签、混合方向或其他想法。仓库不捆绑自定义 GUI，因此能够在不同 Codex 环境中保持可移植性。
+
+## 安装
+
+将 `skills/guided-goal-discovery` 复制到 Codex skills 目录。
 
 ### PowerShell
 
 ```powershell
-Copy-Item -Recurse .\skills\guided-goal-discovery "$env:USERPROFILE\.codex\skills\"
+$skillsRoot = Join-Path $env:USERPROFILE ".codex\skills"
+Copy-Item -Recurse -Force .\skills\guided-goal-discovery $skillsRoot
 ```
 
-### macOS or Linux
+### macOS 或 Linux
 
 ```bash
 cp -R skills/guided-goal-discovery ~/.codex/skills/
 ```
 
-Restart or reload Codex if the skill does not appear immediately.
+如果 Skill 没有立即出现，请重启或刷新 Codex。
 
-## Use
+## 使用
 
-Invoke it explicitly:
-
-```text
-Use $guided-goal-discovery to help me clarify a vague idea and establish a concrete 0-to-1 starting point.
-```
-
-中文示例：
+明确调用 Skill：
 
 ```text
-使用 $guided-goal-discovery，一次问我一个问题，帮助我明确真正目标并形成0→1启动方案。
+使用 $guided-goal-discovery，一次问我一个问题，帮助我明确真正目标；在可用时提供可点击选项，并始终允许我输入其他想法。
 ```
 
-The skill may also activate when unclear purpose would lead to fundamentally different outcomes. It is designed not to interrupt clear requests, factual questions, revisions, diagnostics, or aligned continuation work.
+用于模糊创意：
 
-## Adaptive choice interaction
+```text
+使用 $guided-goal-discovery 帮我找到这个影像想法真正想表达的内核，再决定最适合的表现形式。
+```
 
-Version 0.2.0 prefers the host's native structured-choice control when one decision can be represented honestly by two or three distinct alternatives. The user can click an option or use the control's free-form “Other” input.
+用于尚未定义的项目：
 
-When that control is unavailable, the skill presents the same labels and descriptions as concise numbered text. Users can reply with a number, a label, a mixture, or a different idea. A selection remains provisional and can always be revised.
+```text
+使用 $guided-goal-discovery 帮我把这个零散想法整理成目标共识和可以正式开始的 0→1 方案。
+```
 
-The repository intentionally does not bundle a custom GUI. This keeps the skill portable across Codex environments while progressively enhancing the experience in hosts and modes that expose a compatible choice control.
+## 核心交付
 
-## Core output
+最终输出包含四部分：
 
-The final output contains four parts:
+1. **意义共识**：核心目标、重要性、对象与情境、预期体验或变化。
+2. **项目形态**：当前交付物、范围，以及本阶段明确不做的内容。
+3. **判断标准**：不可妥协项、排除方向、取舍优先级和成功证据。
+4. **0→1 启动方案**：首个里程碑、所需输入与资源、推荐执行路径和交接对象。
 
-1. Meaning Consensus
-2. Project Form
-3. Judgment Criteria
-4. 0-to-1 Launch Plan
+## 仓库结构
 
-## License
+```text
+guided-goal-discovery/
+├── README.md
+├── README.en.md
+├── LICENSE
+└── skills/
+    └── guided-goal-discovery/
+        ├── SKILL.md
+        └── agents/
+            └── openai.yaml
+```
 
-MIT License. See [LICENSE](LICENSE).
+仓库级说明和许可证位于 Skill 目录之外，使可安装的 Skill 本体保持最小化。
+
+## 验证
+
+使用 `skill-creator` 的校验脚本检查 Skill 结构：
+
+```bash
+python /path/to/skill-creator/scripts/quick_validate.py skills/guided-goal-discovery
+```
+
+## 许可
+
+[MIT License](LICENSE)
