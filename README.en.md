@@ -2,6 +2,8 @@
 
 [简体中文](README.md)
 
+**Current version: v0.3.0 | GPT-6 Astra adaptation**
+
 A Codex skill that turns vague intentions, sparse ideas, and conflicting preferences into a shared goal and a concrete 0-to-1 launch plan through one decision-relevant question at a time.
 
 It does not require the user to arrive with a complete brief, and it avoids producing a polished solution before the direction is understood. The skill first clarifies why the project should exist, who it is for, and what should change; it then defines the current deliverable, boundaries, judgment criteria, and the first milestone that makes execution genuinely begin.
@@ -18,10 +20,10 @@ When a direction can be represented by a small set of working hypotheses, the sk
 - Asks only one high-value question per turn instead of presenting an intake form.
 - Proposes two or three meaningfully different working hypotheses so users can discover direction through attraction, resistance, and correction.
 - Separates the goal, current deliverable, and implementation method instead of treating the first requested format as the true purpose.
-- Moves through three stages—Meaning, Form, and Judgment—with confirmation at each stage boundary.
+- Moves through Meaning, Form, and Judgment, confirming only consequential interpretations that remain unresolved.
 - Uses eight internal dimensions: purpose, recipient and context, experience, deliverable, scope, boundaries, success evidence, and tradeoffs.
 - Provides native clickable choices when available and equivalent numbered text everywhere else.
-- Preserves free-form input and reversibility; every click or text selection remains provisional.
+- Preserves free-form input and reversibility; exploratory selections are provisional, while explicit confirmation or execution instructions count.
 - Produces a Goal Consensus + 0-to-1 Launch Plan and hands all confirmed boundaries and priorities to execution.
 - Avoids interrupting clear requests, factual questions, diagnostics, revisions, or aligned continuation work.
 
@@ -35,7 +37,7 @@ When a direction can be represented by a small set of working hypotheses, the sk
 | Adaptive choices | Use a native structured-choice control when available; otherwise present the same alternatives as concise numbered text |
 | Free correction | Always allow “Other,” blended directions, added conditions, reversals, or replacement of the proposed frame |
 | Three-layer separation | Keep the goal, current deliverable, and implementation method distinct throughout discovery |
-| Three-stage progression | Move through Meaning → Form → Judgment and pause for confirmation after every stage |
+| Three-stage progression | Use Meaning → Form → Judgment as a map; skip settled stages and avoid repeated approval gates |
 | Eight-dimension map | Internally check purpose, recipient and context, experience, deliverable, scope, boundaries, success evidence, and tradeoffs |
 | Transparent state | Separate confirmed facts, working interpretations, excluded directions, and items that still need confirmation |
 | Recognizable success | Define non-negotiables, excluded directions, priority conflicts, and observable success evidence before launch |
@@ -48,9 +50,24 @@ Since v0.2.0, the skill prefers a host-provided native structured-choice control
 - put the recommended option first when a recommendation is justified and label it clearly;
 - describe the effect or tradeoff of every option in one sentence;
 - preserve the free-form “Other” route;
-- treat the click as a working interpretation rather than final confirmation.
+- treat exploratory clicks as working interpretations; explicit confirmation or execution choices count, and later corrections still take precedence.
 
 If the current environment exposes no compatible control, the skill presents the same labels and descriptions in text and lets the user answer with a number, a label, a mixture, or a different idea. The repository deliberately bundles no custom GUI, keeping the skill portable across Codex environments.
+
+## GPT-6 Astra support
+
+v0.3.0 follows [OpenAI’s Astra skill migration guidance](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra) by shortening the trigger description and removing redundant confirmation gates while preserving one-question discovery and the goal-consensus output. This skill supplies workflow instructions: it does not pin a model or change global Codex settings. Select **GPT-6 Astra** in the host’s model picker. Other skill-compatible models can still use it.
+
+| Adaptation | Implementation |
+|---|---|
+| Host-aware controls | Use only tools and parameters permitted in the current mode; the model name does not imply GUI availability |
+| Synchronous choices | Use permitted controls such as `request_user_input`; do not invoke a Plan-only tool in another mode |
+| Asynchronous choices | Handle host-provided `request_user_input_async`; wait for an actual reply rather than treating a receipt or preselected option as an answer |
+| Free-form input | Preserve qualifications and blended directions; do not duplicate a host-provided free-text route with another “Other” option |
+| Mid-turn correction | Update affected interpretations when the user changes direction without restarting settled discovery |
+| Timely execution | Stop mechanical questioning once the direction is confirmed or the user delegates the remaining decisions |
+
+Clickable choices depend on host tools, not on Astra alone. This is an instruction and packaging compatibility update; structural validation is not a model behavior test. Live multi-turn acceptance scenarios are documented in the [acceptance checklist](tests/acceptance.md).
 
 ## Installation
 
@@ -107,6 +124,8 @@ guided-goal-discovery/
 ├── README.md
 ├── README.en.md
 ├── LICENSE
+├── tests/
+│   └── acceptance.md
 └── skills/
     └── guided-goal-discovery/
         ├── SKILL.md
@@ -121,7 +140,7 @@ Repository-level documentation and licensing stay outside the skill directory so
 Use the `skill-creator` validator to check the skill structure:
 
 ```bash
-python /path/to/skill-creator/scripts/quick_validate.py skills/guided-goal-discovery
+python -X utf8 /path/to/skill-creator/scripts/quick_validate.py skills/guided-goal-discovery
 ```
 
 ## License
