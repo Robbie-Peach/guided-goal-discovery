@@ -2,13 +2,13 @@
 
 [简体中文](README.md)
 
-**Current version: v0.3.0 | GPT-6 Astra adaptation**
+**Current version: v0.3.1 | GPT-6 Astra multi-turn collaboration**
 
 A Codex skill that turns vague intentions, sparse ideas, and conflicting preferences into a shared goal and a concrete 0-to-1 launch plan through one decision-relevant question at a time.
 
 It does not require the user to arrive with a complete brief, and it avoids producing a polished solution before the direction is understood. The skill first clarifies why the project should exist, who it is for, and what should change; it then defines the current deliverable, boundaries, judgment criteria, and the first milestone that makes execution genuinely begin.
 
-When a direction can be represented by a small set of working hypotheses, the skill prefers native clickable choices supplied by the host. When that control is unavailable, it falls back to the same alternatives as concise numbered text. Users can always choose “Other,” combine directions, explain a reaction, or overturn an earlier selection.
+Each round defaults to two or three numbered text options, waits for the user's selection or explanation, and uses that response to shape the next round. Users can blend directions, offer another idea, or overturn earlier choices. Clickable controls are optional, not a prerequisite; model confidence never substitutes for user confirmation.
 
 **Inputs:** vague intentions, sparse creative seeds, conflicting preferences, uncertainty about where to begin, or requests whose outcome would change fundamentally under different interpretations.
 
@@ -22,7 +22,7 @@ When a direction can be represented by a small set of working hypotheses, the sk
 - Separates the goal, current deliverable, and implementation method instead of treating the first requested format as the true purpose.
 - Moves through Meaning, Form, and Judgment, confirming only consequential interpretations that remain unresolved.
 - Uses eight internal dimensions: purpose, recipient and context, experience, deliverable, scope, boundaries, success evidence, and tradeoffs.
-- Provides native clickable choices when available and equivalent numbered text everywhere else.
+- Defaults to numbered text choices and waits for a reply; native clickable controls are optional.
 - Preserves free-form input and reversibility; exploratory selections are provisional, while explicit confirmation or execution instructions count.
 - Produces a Goal Consensus + 0-to-1 Launch Plan and hands all confirmed boundaries and priorities to execution.
 - Avoids interrupting clear requests, factual questions, diagnostics, revisions, or aligned continuation work.
@@ -34,40 +34,41 @@ When a direction can be represented by a small set of working hypotheses, the sk
 | One question at a time | Ask only the single question whose answer would materially change the direction; do not use a fixed questionnaire |
 | Meaning before method | Clarify why the work should exist, for whom, and with what intended experience before discussing medium, format, or tools |
 | Active hypotheses | When the user cannot answer, propose two or three genuinely different working interpretations instead of returning the creative burden |
-| Adaptive choices | Use a native structured-choice control when available; otherwise present the same alternatives as concise numbered text |
+| Options and waiting | Offer two or three numbered alternatives and free-form input; wait for the user's response before the next round |
 | Free correction | Always allow “Other,” blended directions, added conditions, reversals, or replacement of the proposed frame |
 | Three-layer separation | Keep the goal, current deliverable, and implementation method distinct throughout discovery |
-| Three-stage progression | Use Meaning → Form → Judgment as a map; skip settled stages and avoid repeated approval gates |
+| Three-stage progression | Collaborate through Meaning → Form → Judgment; user confirmations, not model inferences, settle consequential interpretations |
 | Eight-dimension map | Internally check purpose, recipient and context, experience, deliverable, scope, boundaries, success evidence, and tradeoffs |
 | Transparent state | Separate confirmed facts, working interpretations, excluded directions, and items that still need confirmation |
 | Recognizable success | Define non-negotiables, excluded directions, priority conflicts, and observable success evidence before launch |
 | Lossless handoff | Deliver a complete goal consensus and 0-to-1 plan so execution does not ask the user to restate the request |
 
-## Adaptive choice interaction
+## Options and multi-turn collaboration
 
-Since v0.2.0, the skill prefers a host-provided native structured-choice control when one key question can be represented honestly by two or three mutually exclusive directions:
+v0.3.1 defaults to text options → user reply → updated understanding → next round:
 
-- put the recommended option first when a recommendation is justified and label it clearly;
-- describe the effect or tradeoff of every option in one sentence;
-- preserve the free-form “Other” route;
-- treat exploratory clicks as working interpretations; explicit confirmation or execution choices count, and later corrections still take precedence.
+- Ask one key question with two or three concrete directions and short explanations.
+- Allow a number, a blend, or free-form input, then stop and wait.
+- Continue exploring unresolved dimensions after each reply instead of immediately producing a full result.
+- A checkpoint confirmation settles that stage only; delegating one choice does not delegate the whole collaboration.
+- Synthesize the confirmed goal into a launch plan and execute when requested; honor an explicit instruction to stop discovery and decide/proceed for the whole task.
 
-If the current environment exposes no compatible control, the skill presents the same labels and descriptions in text and lets the user answer with a number, a label, a mixture, or a different idea. The repository deliberately bundles no custom GUI, keeping the skill portable across Codex environments.
+No custom GUI is bundled. Suitable host controls may optionally present the same choices; a tool receipt or preselected option is not a user answer.
 
 ## GPT-6 Astra support
 
-v0.3.0 follows [OpenAI’s Astra skill migration guidance](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra) by shortening the trigger description and removing redundant confirmation gates while preserving one-question discovery and the goal-consensus output. This skill supplies workflow instructions: it does not pin a model or change global Codex settings. Select **GPT-6 Astra** in the host’s model picker. Other skill-compatible models can still use it.
+v0.3.1 draws on [OpenAI’s Astra skill migration guidance](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra) to clarify invocation while preserving the user's requested multi-turn collaboration, rather than letting the model infer every decision and deliver immediately. The skill does not pin a model or change global settings. Select **GPT-6 Astra** in the host and invoke this skill. Other skill-compatible models can still use it.
 
 | Adaptation | Implementation |
 |---|---|
-| Host-aware controls | Use only tools and parameters permitted in the current mode; the model name does not imply GUI availability |
-| Synchronous choices | Use permitted controls such as `request_user_input`; do not invoke a Plan-only tool in another mode |
-| Asynchronous choices | Handle host-provided `request_user_input_async`; wait for an actual reply rather than treating a receipt or preselected option as an answer |
-| Free-form input | Preserve qualifications and blended directions; do not duplicate a host-provided free-text route with another “Other” option |
-| Mid-turn correction | Update affected interpretations when the user changes direction without restarting settled discovery |
-| Timely execution | Stop mechanical questioning once the direction is confirmed or the user delegates the remaining decisions |
+| Correct invocation | Enter guided collaboration when invoked or requested; do not interrupt ordinary clear execution tasks automatically |
+| Options each round | Ask one key question with two or three concrete directions and free expression; no clickable UI required |
+| Real user replies | Stop after the question and continue from the actual answer; never simulate replies or choose defaults on the user's behalf |
+| No premature result | Model confidence, a local choice, or checkpoint approval does not authorize an immediate final solution |
+| Multi-turn collaboration | Explore meaning, form, and judgment through shared confirmation; allow corrections without imposing a fixed round count |
+| Explicit handoff | Synthesize the confirmed goal into a launch plan and execute when requested; honor an explicit instruction to stop discovery |
 
-Clickable choices depend on host tools, not on Astra alone. This is an instruction and packaging compatibility update; structural validation is not a model behavior test. Live multi-turn acceptance scenarios are documented in the [acceptance checklist](tests/acceptance.md).
+This update focuses on invocation and collaborative behavior, not mandatory clickable interactions. Structural validation is not a model behavior test. Live multi-turn acceptance scenarios are documented in the [acceptance checklist](tests/acceptance.md).
 
 ## Installation
 
@@ -93,7 +94,7 @@ Restart or refresh Codex if the skill does not appear immediately.
 Invoke the skill explicitly:
 
 ```text
-Use $guided-goal-discovery to clarify my true goal one question at a time. Offer clickable choices when available, and always let me enter a different idea.
+Use $guided-goal-discovery to ask one question with options each round. Wait for my choice or explanation before continuing, and clarify the goal together over multiple turns instead of giving the final plan immediately.
 ```
 
 For a vague creative seed:

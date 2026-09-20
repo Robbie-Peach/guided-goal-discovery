@@ -1,4 +1,4 @@
 interface:
   display_name: "目标引导模式"
-  short_description: "一次一问，并在可用时提供可点击选项，形成清晰目标共识"
-  default_prompt: "使用 $guided-goal-discovery，通过一次一个问题帮助我明确真正目标；在可用时提供可点击选项，并始终允许我输入其他想法。"
+  short_description: "一次一问并提供文字选项，等待用户选择，通过多轮协作形成目标共识"
+  default_prompt: "使用 $guided-goal-discovery，每轮问我一个问题并提供选项，等待我选择或补充后再继续，通过多轮协作确认目标，不要直接给出最终方案。"

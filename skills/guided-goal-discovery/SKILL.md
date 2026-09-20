@@ -1,25 +1,27 @@
 ---
 name: guided-goal-discovery
-description: Clarify vague intentions or conflicting goals through one question at a time, then produce a shared goal and a 0-to-1 launch plan. Use for requested guided discovery or ambiguity that would materially change the outcome. Skip clear tasks, aligned continuations, and decisions the user delegates.
+description: Guide multi-turn goal discovery with one question and selectable options per round, waiting for the user before continuing. Use when the user requests guided questions, invokes this skill, or needs help clarifying vague or conflicting goals. Do not auto-start discovery for clear execution tasks or aligned continuations.
 ---
 
 # Guided Goal Discovery
 
-Help the user discover and confirm a goal instead of requiring a finished brief. Treat sparse language, uncertainty, and “I don’t know” as valid starting material. End with a confirmed goal consensus and a concrete 0-to-1 launch plan, then hand off to execution.
+Help the user discover and confirm a goal through multi-turn collaboration instead of requiring a finished brief or guessing the final result. Treat sparse language, uncertainty, and “I don’t know” as valid starting material. The interaction itself is part of the deliverable: offer directions, receive a real choice or correction, refine the understanding, and continue. End with a user-confirmed goal consensus and a concrete 0-to-1 launch plan, then hand off to execution.
 
 ## Interaction contract
 
-- Enter guided mode only while a consequential goal decision remains unresolved; briefly explain the one-question approach when entering.
-- Ask at most one decision-relevant question per turn. Ask none when the direction is ready or the user asks you to decide and proceed.
+- When the user invokes this skill or requests guided discovery, enter the collaborative question-and-choice loop. Do not replace it with a one-shot solution because you believe you understand the goal.
+- During discovery, ask one decision-relevant question per turn, offer two or three concrete directions plus free-form input, and stop for the user's reply. Use the next turn to incorporate that reply and ask the next relevant question.
 - Choose the question whose answer would most change the direction; do not follow a fixed questionnaire.
 - Make questions easy to answer through concrete contrasts, examples, outcomes, or felt differences.
-- Prefer a native structured-choice control for bounded alternatives when the runtime provides one; otherwise present the same choices as concise numbered text.
+- Default to numbered text options. Clickable controls are optional; the skill must work without them.
 - Match the user’s language and level of abstraction; avoid unexplained professional jargon.
 - Never ask again for information already supplied.
 - Let the user revise or revoke any earlier confirmation at any time, including during a turn. Update the affected assumptions and next action without restarting already settled discovery.
 - Do not make the user write a professional brief. Translate everyday reactions into usable requirements.
 
 Act as a hypothesis-generating collaborator, not a passive interviewer. When the user lacks an answer, propose two or three meaningfully different working hypotheses. Recommend one when helpful and explain why, but mark it as provisional. Let the user’s attraction, resistance, corrections, and rejection carry more weight than the recommendation.
+
+Keep recommendations distinct from decisions. A plausible inference, model confidence, silence, or selecting one direction is not permission to fill in every remaining goal dimension and deliver the final solution. If an explicitly invoked discovery request already contains a detailed brief, start by confirming the most consequential interpretation instead of silently switching to execution. Do not manufacture extra rounds after the user has confirmed the goal and asked to proceed.
 
 ## Distinguish the three layers
 
@@ -72,23 +74,23 @@ Identify non-negotiables, excluded directions, success evidence, and priority wh
 
 When the user says “I don’t know,” do not repeat or broaden the question. Offer two or three genuinely different hypotheses and ask which feels closer—or which feels wrong.
 
-## Present choices adaptively
+## Offer options and wait
 
-Use a native structured-choice tool such as `request_user_input` or `request_user_input_async` only when it is exposed and permitted in the current mode, and all of the following are true:
+Each ordinary discovery round contains a brief update of what the last reply clarified, one question, and two or three meaningfully different options. Give each option a short label and a one-sentence effect or tradeoff. Mark a recommendation only when useful, never select it for the user. Allow a number, a label, a blend, rejection of all options, or another idea. For nuanced personal expression, offer directions as non-exhaustive prompts rather than forcing a false choice.
 
-- one decision-relevant question is ready;
-- two or three short, meaningfully different answers that are mutually exclusive at the level being decided would help the user react;
-- choosing an option would narrow the goal rather than prematurely choose an implementation detail.
+For example, after the user introduces a film about endless effort:
 
-Follow the active tool schema, not a remembered schema or the model name. Keep the question short. Put a justified recommendation first and label it; describe each option’s effect or tradeoff in the fields the tool supports. Preserve free-form input. If the host automatically supplies an “Other” or free-text route, do not add a duplicate option.
+> 面对这种徒劳，你更希望影片留下哪种态度？
+> 1. 反抗：即使终点不可达，行动本身仍有意义。
+> 2. 崩塌：希望在重复失败中逐渐耗尽。
+> 3. 荒诞：让观众怀疑“必须抵达终点”这个要求。
+> 你可以回复序号、混合方向，或补充其他想法。
 
-- **Synchronous control:** read the returned user answer before advancing. A Plan-only tool stays Plan-only even if its name is visible elsewhere.
-- **Asynchronous control:** submitting the question is not receiving an answer. Keep only one unresolved discovery question active. A tool receipt, a preselected option, silence, or unrelated new input is not consent. If the next decision depends on the answer, end the turn after submitting the question and resume when the user responds; do not poll, repeat the question, or choose the default on their behalf. Follow explicit host instructions for a completed no-answer result; if they require proceeding, state the working assumption rather than treating it as confirmation.
-- **Correction or delegation:** a later user correction overrides the affected hypothesis. If the user rejects the framing or asks you to choose, honor that response instead of waiting for a particular button click.
+End the turn here. If the user chooses “3,” incorporate absurdity as the chosen direction and continue with the next unresolved dimension; do not jump straight to a complete script, format, and production plan. Do not prewrite later questions as an intake form or simulate the user's future answers.
 
-If no structured-choice tool is exposed and permitted, ask the same single question in ordinary text. List the same two or three options with short labels and descriptions, then explicitly allow the user to answer with a number, a label, a mixture, or another idea. Do not ask the user to switch modes just to obtain a control. If an available tool errors, distinguish that failure from ordinary absence; follow the host’s error-handling instructions without inventing a response.
+Native choice tools may replace the numbered presentation when exposed and permitted in the current mode. Follow their current schema and preserve free-form input without duplicating a host-provided “Other” route. A Plan-only tool remains Plan-only. With an asynchronous control, a submission receipt or preselection is not an answer: end the turn and resume on the actual user reply, without polling or submitting another discovery question. Follow explicit host instructions for a completed no-answer result without presenting an assumption as user confirmation. No GUI, mode switch, or model-specific tool is required.
 
-Treat exploratory selections as working signals, not approval of an entire plan. An explicit confirmation or “start execution” response does count for the decision it names, whether clicked or typed; do not ask for it again. Let the user combine options, qualify the choice, reverse it, or replace the offered frame. Do not force choices for open exploration, nuanced expression, or a decision that cannot be represented honestly by two or three alternatives.
+An exploratory choice confirms only the direction it names, not the entire plan. A checkpoint confirmation settles that checkpoint, not every later stage. Likewise, “you choose this option” delegates that choice, not the entire collaboration. Only an explicit instruction to stop questioning and decide/proceed for the whole task ends discovery early. Later explanations or corrections override the affected interpretation.
 
 Prefer questions such as:
 
@@ -107,15 +109,15 @@ At a meaningful stage boundary, briefly summarize only changed information in th
 - **Excluded:** rejected or determined inconsistent with the goal.
 - **Needs confirmation:** still capable of changing the next stage.
 
-Ask for confirmation only when an unconfirmed interpretation would change the next stage. Carry forward explicit user decisions without another approval gate. Skip settled or irrelevant stages; the stages are a map, not a mandatory interview. Do not repeat a full checkpoint after every answer.
+Before moving to a new stage, make the shared understanding visible and let the user confirm or correct any consequential interpretation not already explicitly confirmed. Offer “confirm and continue” and “revise” as the single question for that turn, with free-form correction. Carry forward already confirmed decisions without asking them again, but do not label inferred stages as settled simply to shorten the dialogue. The stages are a map, not a fixed number of rounds.
 
-When a checkpoint is genuinely binary, use the same adaptive interaction: offer confirmation and correction through a structured choice when available, or concise text otherwise. Keep the free-form correction path open.
+When a checkpoint is genuinely binary, offer confirmation and correction as concise text options; an available permitted control may present the same choices. Keep the free-form correction path open.
 
 ## Determine readiness
 
 Stop discovery when all of the following are true:
 
-- the user can confirm, “Yes, this is what I truly want to do”;
+- the user has confirmed the shared goal, not merely been predicted to agree;
 - the desired change, relevant recipient or context, and intended experience are clear;
 - the current deliverable and scope are defined;
 - the decisive boundaries and tradeoff priorities are known;
@@ -123,7 +125,7 @@ Stop discovery when all of the following are true:
 - remaining unknowns concern implementation rather than the project’s core direction;
 - a first milestone can directly make the project begin to exist.
 
-If a missing goal decision prevents a useful starting point, ask the one question that resolves it. Implementation uncertainty can belong in the launch plan; it need not prolong discovery. Do not hide unresolved direction behind premature execution or false numerical confidence. If the user delegates the remaining choices, state reasonable assumptions and proceed within the authorized task.
+If a missing goal decision prevents a useful starting point, offer alternatives and wait for the user's response. Implementation uncertainty can belong in the launch plan; it need not prolong discovery. Model confidence is not a substitute for user participation. Respect an explicit request to stop discovery and let you decide the whole task, but do not infer it from a short answer, a local choice, or approval of one checkpoint.
 
 ## Produce the final output
 
@@ -147,11 +149,11 @@ State the first milestone that makes the project begin to exist, why it is the c
 
 Include working assumptions or unresolved items only when they genuinely remain; do not force empty template fields.
 
-Ask whether to adopt this as the formal starting point and enter execution only if that decision remains open. If the user already confirmed it or delegated the remaining choices and requested execution, hand off without repeating the question. Keep the four sections concise and proportional to the project.
+After the shared direction is confirmed, present this synthesis and offer “adopt and start” or “revise” before execution. If the user already explicitly approved the plan and requested execution, do not ask again. Keep the four sections concise and proportional to the project; they summarize the collaboration rather than replacing it.
 
 ## Exit and hand off
 
-After final confirmation or explicit delegation to proceed:
+After final confirmation to execute or an explicit whole-task instruction to stop discovery and proceed:
 
 - exit guided mode;
 - pass the complete goal consensus and launch plan to the appropriate execution skill, tool, or workflow without asking the user to restate the request;
@@ -169,4 +171,4 @@ After final confirmation or explicit delegation to proceed:
 - Do not treat a selected option as more authoritative than the user’s explanation or later correction.
 - Do not substitute decorative detail for a missing goal.
 - Do not praise every answer; synthesize it into better decisions.
-- Do not continue questioning after the project is ready to begin.
+- Do not end discovery merely because the model thinks the project is ready; honor the user's confirmations and explicit request to begin.
